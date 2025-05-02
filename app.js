@@ -110,6 +110,14 @@ class BookGenerator {
         return character.getSummary();
     }
 
+    getCharacters() {
+        console.log('Fetching all characters');
+        if (!this.characters.length) {
+            return 'No characters created yet.';
+        }
+        return this.characters.map(c => c.getSummary()).join('<hr>');
+    }
+
     setBookDetails(genre, setting, tone, themes, page_count, chapter_count, conflict_intensity, title, key_plot_points) {
         console.log(`Setting book details: ${title}`);
         this.genre = this.validateNonEmptyString(genre, 'Genre');
@@ -320,6 +328,20 @@ app.post('/add_character', (req, res) => {
         res.json({ success: true, message: output });
     } catch (error) {
         console.error(`Error in add_character: ${error.message}`);
+        res.json({ success: false, message: `Error: ${error.message}` });
+    }
+});
+
+app.get('/get_characters', (req, res) => {
+    console.log('Accessing get_characters route');
+    try {
+        if (!req.session.generator) {
+            req.session.generator = new BookGenerator();
+        }
+        const output = req.session.generator.getCharacters();
+        res.json({ success: true, message: output });
+    } catch (error) {
+        console.error(`Error in get_characters: ${error.message}`);
         res.json({ success: false, message: `Error: ${error.message}` });
     }
 });
